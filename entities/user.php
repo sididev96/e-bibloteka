@@ -75,10 +75,50 @@ class User{
     }
 
   }
-  public function login()
+  public function login($email, $password){
 
+    $findUserQuery =
+    "SELECT * FROM ". $this->db_table ." WHERE email = ? LIMIT 0,1";
 
+    $stmt = $this->conn->prepare($findUserQuery);
+    $stmt->bindParam(1, $email);
+    $stmt->execute();
 
+    $rowNumbers = $stmt->rowCount();
+
+    if($rowNumbers > 0){
+
+      $dataRow = $stmt->fetch(PDO::FETCH_ASSOC);
+
+      $this->id = $dataRow('id');
+      $this->first_name = $dataRow('first_name');
+      $this->last_name = $dataRow('last_name');
+      $this->email = $dataRow('email');
+      $this->password = $dataRow('password');
+      $this->age = $dataRow('age');
+      $this->gender = $dataRow('gender');
+
+      if($this->password == $password){
+        $e = array(
+          "id"=>$this->id,
+          "first_name" => $this->first_name,
+          "last_name" => $this->last_name,
+          "email" => $this->email,
+          "age" => $this->age,
+          "gender" => $this->gender,
+        );
+
+        return print_r(['payload' => $e]);
+      }else {
+        http_response_code(401);
+        return print_r(['status' => 'false', 'message'=> 'Wrong Credentials!']);
+      }
+    }else {
+        http_response_code(401);
+        return print_r(['status' => 'false', 'message'=> 'Wrong Credentials!']);
+  }
+
+ }
 }
 
 ?>
