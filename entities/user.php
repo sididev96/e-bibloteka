@@ -60,11 +60,25 @@ class User{
     $stmt->bindParam(":age", $this->age);
     $stmt->bindParam(":gender", $this->gender);
 
-    if ($stmt->execute()){
+    try{
+      $stmt->execute();
+      print_r("success already executed");
       return true;
+   } catch(PDOException $error){
+      $errorcode = json_encode($error->errorInfo[0]);
+      if($errorcode == 1062){
+        http_response_code(400);
+        return print_r(['status' => 'false','message'=>'email is already in use']);
+      } else{
+        return print_r(['status' => 'false','message'=>'Error']);
+      }
     }
-    return false;
+
   }
+  public function login()
+
+
+
 }
 
 ?>
